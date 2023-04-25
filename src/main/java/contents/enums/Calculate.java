@@ -1,4 +1,4 @@
-package enums;
+package contents.enums;
 
 public enum Calculate {
     SUM ("+") { public int apply(int a, int b) { return a + b; } },
