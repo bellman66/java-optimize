@@ -1,8 +1,8 @@
-package contents.enums;
+package contents.enums.abstractMethod;
 
-import static contents.enums.Calculate.*;
+import static contents.enums.abstractMethod.Calculate.*;
 
-public class EnumStrategy {
+public class AbstractEnum {
 
     private static int calculate(Calculate symbol, int a, int b) {
         return symbol.apply(a, b);
