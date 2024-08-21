@@ -1,4 +1,4 @@
-package origin.jsr41_bigdecimal;
+package origin.jsr13_bigdecimal;
 
 import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
