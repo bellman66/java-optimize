@@ -1,4 +1,4 @@
-package com.sample.core;
+package com.util;
 
 public class Printer {
 
