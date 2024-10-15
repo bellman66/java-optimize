@@ -3,9 +3,11 @@ package lang.reflect;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 public class ReflectectionSample {
@@ -40,5 +42,22 @@ public class ReflectectionSample {
         TestClass testClass = (TestClass) constructor.newInstance("jack");
 
         assertInstanceOf(TestClass.class, testClass);
+    }
+
+    @Test
+    void fieldReflectionTest() throws IllegalAccessException, NoSuchFieldException {
+        Class<?> targetClass = TestClass.class;
+        TestClass testClass = new TestClass("jack");
+
+        Field field = targetClass.getDeclaredField("title");
+
+        field.setAccessible(true);
+        String title = (String) field.get(testClass);
+
+        field.set(testClass, "rose");
+        String next = (String) field.get(testClass);
+
+        assertEquals(title, "jack");
+        assertEquals(next, "rose");
     }
 }
