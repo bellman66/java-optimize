@@ -6,8 +6,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
+import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,11 +54,26 @@ public class AnnotationSample {
         TestClass testClass = new TestClass();
 
         // when
-        List<Method> target = Arrays.stream(testClass.getClass().getMethods())
+        List<Method> result = Arrays.stream(testClass.getClass().getMethods())
                 .filter(method -> method.isAnnotationPresent(MyAnnotation.class))
                 .toList();
 
         // then
-        assertEquals(target.size(), 2);
+        assertEquals(result.size(), 2);
+    }
+
+    @Test
+    void findMethodNameTest() {
+        // given
+        TestClass testClass = new TestClass();
+
+        // when
+        String result = Arrays.stream(testClass.getClass().getMethods())
+                .filter(method -> method.isAnnotationPresent(OtherAnnotation.class))
+                .map(Method::getName)
+                .collect(Collectors.joining());
+
+        // then
+        assertEquals(result, "callThirdMethod");
     }
 }
