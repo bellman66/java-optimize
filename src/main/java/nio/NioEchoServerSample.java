@@ -34,11 +34,10 @@ public class NioEchoServerSample {
 
                 if (key.isAcceptable()) {
                     accept(key);
-                }
-
-                if (key.isReadable()) {
+                } else if (key.isReadable()) {
                     read(buffer, key);
                 }
+
                 keyIterator.remove();
             }
         }
@@ -65,8 +64,6 @@ public class NioEchoServerSample {
 
         buffer.flip();
         System.out.println("Received: " + new String(buffer.array(), 0, buffer.limit()));
-
-        buffer.rewind();
         socketChannel.write(buffer);
         buffer.clear();
     }

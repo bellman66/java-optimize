@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 public class ChannelSample {
 
     @Test
-    void channelTest() {
+    void FileChannelTest() {
         // given
         Path path = Path.of(System.getProperty("user.dir"), "src", "main", "java", "nio", "example.txt");
 
