@@ -23,14 +23,32 @@ public class Account {
     }
 
     public void deposit(int amount) {
-        withLock(depositAction, amount);
+        actionWithLock(depositAction, amount);
     }
 
     public void withdraw(int amount) {
-        withLock(withdrawAction, amount);
+        actionWithLock(withdrawAction, amount);
     }
 
-    private void withLock(BiConsumer<Account, Integer> action, int amount) {
+    public void transfer(Account other, int amount) {
+        if (this == other) {
+            throw new IllegalArgumentException("동일 계좌내 이체는 불가능합니다.");
+        }
+
+        MultiLock multiLock = new MultiLock(this.lock, other.lock);
+        multiLock.lockAll();
+
+        try {
+            withdraw(amount);
+            other.deposit(amount);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            multiLock.unlockAll();
+        }
+    }
+
+    private void actionWithLock(BiConsumer<Account, Integer> action, int amount) {
         lock.lock();
 
         try {

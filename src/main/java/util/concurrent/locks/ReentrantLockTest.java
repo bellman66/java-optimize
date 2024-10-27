@@ -50,4 +50,18 @@ public class ReentrantLockTest {
         // then
         Assertions.assertThrows(IllegalStateException.class,executable);
     }
+
+    @Test
+    void transferTest() {
+        // given
+        Account from = new Account("from", 1000);
+        Account to = new Account("to", 1000);
+
+        // when
+        from.transfer(to, 500);
+
+        // then
+        Assertions.assertEquals(500, from.getAmount());
+        Assertions.assertEquals(1500, to.getAmount());
+    }
 }
