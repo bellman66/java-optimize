@@ -37,7 +37,7 @@ public class Account {
         lock.lock();
 
         if (this.amount < amount) {
-            throw new IllegalArgumentException("Not enough amount to withdraw");
+            throw new IllegalStateException("Not enough amount to withdraw");
         }
 
         try {
