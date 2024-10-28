@@ -1,4 +1,4 @@
-package keyword;
+package keyword.sync;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,13 +20,13 @@ public class StaticSync {
 
         try {
             executorService.submit(() -> {
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < 100; i++) {
                     syncMethod();
                 }
             });
 
             executorService.submit(() -> {
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < 100; i++) {
                     syncMethod();
                 }
             });
