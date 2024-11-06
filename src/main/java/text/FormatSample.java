@@ -2,6 +2,8 @@ package text;
 
 import org.junit.jupiter.api.Test;
 
+import java.text.ChoiceFormat;
+import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 
@@ -33,4 +35,31 @@ public class FormatSample {
         assertEquals("1,234,567,890", number);
     }
 
+    @Test
+    void ChoiceFormat() {
+        // given
+        double[] limits = {60, 70, 80, 90};
+        String[] grades = {"D", "C", "B", "A"};
+        ChoiceFormat format = new ChoiceFormat(limits, grades);
+
+        // when
+        String grade1 = format.format(85);
+        String grade2 = format.format(95);
+
+        // then
+        assertEquals("B", grade1);
+        assertEquals("A", grade2);
+    }
+
+    @Test
+    void MessageFormat() {
+        // given
+        String template = "Hello World, {0}! You have {1} new messages.";
+
+        // when
+        String formattedMessage = MessageFormat.format(template, "Youn", 5);
+
+        // then
+        assertEquals("Hello World, Youn! You have 5 new messages.", formattedMessage);
+    }
 }
