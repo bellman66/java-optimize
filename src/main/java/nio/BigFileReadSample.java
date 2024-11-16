@@ -1,6 +1,7 @@
 package nio;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
@@ -40,4 +41,46 @@ public class BigFileReadSample {
             throw new RuntimeException(e);
         }
     }
+
+    @Test
+    void chunkMemoryMappedSample() {
+        // given
+        String path = System.getProperty("user.dir") + "/src/main/java/nio/example.txt";
+        long chunkSize = 1024 * 1024;    // 1MB
+
+        File file = new File(path);
+
+        if (!file.exists()) {
+            throw new RuntimeException("File not found");
+        }
+
+        // then
+        try (
+                RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+                FileChannel fileChannel = randomAccessFile.getChannel();
+        ) {
+            long position = 0;
+            long fileSize = fileChannel.size();
+
+            StringBuilder sb = new StringBuilder();
+            while (position < fileSize) {
+                long size = Math.min(chunkSize, fileSize - position);
+
+                MappedByteBuffer buffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, position, size);
+
+                while (buffer.hasRemaining()) {
+                    sb.append((char) buffer.get());
+                }
+
+                position += size;
+            }
+
+            System.out.println("result = " + sb);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
