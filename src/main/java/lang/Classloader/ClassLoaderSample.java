@@ -7,12 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ClassLoaderSample {
 
     /**
-     * ClassLoaders -> AppClassLoader
-     * Start to JNI_CreateJavaVM Call
+     * Process
+     *  - java.c -> JLI_Launch  Call -> CreateExecutionEnvironment
+     *  - java_md.c -> JVMInit -> ContinueInNewThread -> CallJavaMainInNewThread -> JavaMain
+     *  - java.c -> JavaMain -> InitializeJVM -> CreateJavaVM ->
+     *  - ClassLoaders -> AppClassLoader
      *
-     * @param
-     * @return
-     * @throws
      * @see https://www.ibm.com/docs/ko/i/7.3?topic=api-example-java-invocation
      */
     @Test
