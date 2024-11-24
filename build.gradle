@@ -22,6 +22,8 @@ dependencies {
 
     // h2
     implementation 'com.h2database:h2:1.4.200'
+
+    implementation 'cglib:cglib:3.3.0'
 }
 
 test {
