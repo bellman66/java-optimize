@@ -37,4 +37,22 @@ public class IntrinsicCandidateSample {
         // then
         assertArrayEquals(src, dest);
     }
+
+    /**
+     * Object Sample
+     *
+     * Object 내부는 대부분 IntrinsicCandidate로 구성
+     * Hashcode의 경우 Jdk8이후로 체이닝으로 구현
+     */
+    @Test
+    void objectHashCodeTest() {
+        // given
+        Object object = new Object();
+
+        // when
+        int hashCode = object.hashCode();
+
+        // then
+        System.out.println("hashCode = " + hashCode);
+    }
 }
