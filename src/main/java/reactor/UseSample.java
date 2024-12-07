@@ -29,4 +29,17 @@ public class UseSample {
 
         flux.subscribe();
     }
+
+    @Test
+    void fluxReduce() {
+        // given
+        Mono<String> flux = Flux.<String>create(sink -> {
+                sink.next("hello");
+                sink.next("world");
+                sink.complete();
+            }).concatMap(s -> Flux.just(s.toUpperCase()))
+                .reduce((s1, s2) -> s1 + " " + s2);
+
+        flux.subscribe(System.out::println);
+    }
 }
