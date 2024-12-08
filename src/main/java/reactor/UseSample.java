@@ -1,4 +1,4 @@
-package webflux;
+package reactor;
 
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
