@@ -24,6 +24,9 @@ dependencies {
     implementation 'com.h2database:h2:1.4.200'
 
     implementation 'cglib:cglib:3.3.0'
+
+    // https://mvnrepository.com/artifact/io.projectreactor/reactor-core
+    implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.7.0'
 }
 
 test {
