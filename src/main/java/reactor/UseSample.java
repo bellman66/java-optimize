@@ -79,4 +79,32 @@ public class UseSample {
         upperFlux.collect(StringBuilder::new, StringBuilder::append)
                 .subscribe((result) -> Assertions.assertEquals("abc", result.toString()));
     }
+
+    @Test
+    void fluxFilter() {
+        // given
+        Flux<Integer> flux = Flux.just(1, 2, 3, 4, 5);
+
+        // when
+        flux.filter(i -> i % 2 == 0)
+                .filterWhen(i -> Mono.just(i % 4 == 0))
+                .subscribe(result -> Assertions.assertEquals(4, result));
+    }
+
+    @Test
+    void fluxSwitch() {
+        // given
+        Flux<Integer> flux = Flux.just(1, 2, 3, 4, 5);
+
+        // when
+        flux.filter(val -> val > 0)
+                .flatMap(val -> {
+                    if (val % 2 == 0) {
+                        return Flux.just(val);
+                    }
+                    return Flux.empty();
+                })
+                .switchIfEmpty(Mono.error(new RuntimeException("empty")))
+                .subscribe(result -> System.out.println("result = " + result));
+    }
 }
