@@ -1,0 +1,59 @@
+시점
+    javac / 어노테이션 프로세싱
+
+
+JavacProcessingEnvironment.java
+    src/jdk.compiler/share/classes/com.sun.tools.javac.processing/JavacProcessingEnvironment.java
+
+    - instance
+            public static JavacProcessingEnvironment instance(Context context) {
+                JavacProcessingEnvironment instance = context.get(JavacProcessingEnvironment.class);
+                if (instance == null)
+                    instance = new JavacProcessingEnvironment(context);
+                return instance;
+            }
+
+    - initPlatformAnnotations
+            private Set<String> initPlatformAnnotations() {
+                final String module_prefix =
+                    Feature.MODULES.allowedInSource(source) ? "java.base/" : "";
+                return Set.of(module_prefix + "java.lang.Deprecated",
+                              module_prefix + "java.lang.FunctionalInterface",
+                              module_prefix + "java.lang.Override",
+                              module_prefix + "java.lang.SafeVarargs",
+                              module_prefix + "java.lang.SuppressWarnings",
+                              module_prefix + "java.lang.annotation.Documented",
+                              module_prefix + "java.lang.annotation.Inherited",
+                              module_prefix + "java.lang.annotation.Native",
+                              module_prefix + "java.lang.annotation.Repeatable",
+                              module_prefix + "java.lang.annotation.Retention",
+                              module_prefix + "java.lang.annotation.Target",
+                              module_prefix + "java.io.Serial");
+            }
+    - initProcessorLoader
+            private void initProcessorLoader() {
+                try {
+                    if (fileManager.hasLocation(ANNOTATION_PROCESSOR_MODULE_PATH)) {
+                        try {
+                            serviceLoader = fileManager.getServiceLoader(ANNOTATION_PROCESSOR_MODULE_PATH, Processor.class);
+                        } catch (IOException e) {
+                            throw new Abort(e);
+                        }
+                    } else {
+                        // If processorpath is not explicitly set, use the classpath.
+                        processorClassLoader = fileManager.hasLocation(ANNOTATION_PROCESSOR_PATH)
+                            ? fileManager.getClassLoader(ANNOTATION_PROCESSOR_PATH)
+                            : fileManager.getClassLoader(CLASS_PATH);
+
+                        if (options.isSet("accessInternalAPI"))
+                            ModuleHelper.addExports(getClass().getModule(), processorClassLoader.getUnnamedModule());
+
+                        if (processorClassLoader != null && processorClassLoader instanceof Closeable closeable) {
+                            compiler.closeables = compiler.closeables.prepend(closeable);
+                        }
+                    }
+                } catch (SecurityException e) {
+                    processorLoaderException = e;
+                }
+            }
+
