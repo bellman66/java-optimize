@@ -1,0 +1,112 @@
+
+java.base/share/native/libjli/java.c
+
+- JLI_Launch(...)
+
+    JNIEXPORT int JNICALL
+    JLI_Launch(int argc, char ** argv,              /* main argc, argv */
+            int jargc, const char** jargv,          /* java args */
+            int appclassc, const char** appclassv,  /* app classpath */
+            const char* fullversion,                /* full version defined */
+            const char* dotversion,                 /* UNUSED dot version defined */
+            const char* pname,                      /* program name */
+            const char* lname,                      /* launcher name */
+            jboolean javaargs,                      /* JAVA_ARGS */
+            jboolean cpwildcard,                    /* classpath wildcard*/
+            jboolean javaw,                         /* windows-only javaw */
+            jint ergo                               /* unused */
+    )
+    {
+        int mode = LM_UNKNOWN;
+        char *what = NULL;
+        int ret;
+        InvocationFunctions ifn;
+        jlong start = 0, end = 0;
+        char jvmpath[MAXPATHLEN];
+        char jdkroot[MAXPATHLEN];
+        char jvmcfg[MAXPATHLEN];
+
+        _fVersion = fullversion;
+        _launcher_name = lname;
+        _program_name = pname;
+        _is_java_args = javaargs;
+        _wc_enabled = cpwildcard;
+
+        InitLauncher(javaw);
+        DumpState();
+        if (JLI_IsTraceLauncher()) {
+            char *env_in;
+            if ((env_in = getenv(MAIN_CLASS_ENV_ENTRY)) != NULL) {
+                printf("Launched through Multiple JRE (mJRE) support\n");
+            }
+            int i;
+            printf("Java args:\n");
+            for (i = 0; i < jargc ; i++) {
+                printf("jargv[%d] = %s\n", i, jargv[i]);
+            }
+            printf("Command line args:\n");
+            for (i = 0; i < argc ; i++) {
+                printf("argv[%d] = %s\n", i, argv[i]);
+            }
+            AddOption("-Dsun.java.launcher.diag=true", NULL);
+        }
+
+        CreateExecutionEnvironment(&argc, &argv,
+                                   jdkroot, sizeof(jdkroot),
+                                   jvmpath, sizeof(jvmpath),
+                                   jvmcfg, sizeof(jvmcfg));
+
+        ifn.CreateJavaVM = 0;
+        ifn.GetDefaultJavaVMInitArgs = 0;
+
+        if (JLI_IsTraceLauncher()) {
+            start = CurrentTimeMicros();
+        }
+
+        if (!LoadJavaVM(jvmpath, &ifn)) {
+            return(6);
+        }
+
+        if (JLI_IsTraceLauncher()) {
+            end   = CurrentTimeMicros();
+        }
+
+        JLI_TraceLauncher("%ld micro seconds to LoadJavaVM\n", (long)(end-start));
+
+        ++argv;
+        --argc;
+
+        if (IsJavaArgs()) {
+            /* Preprocess wrapper arguments */
+            TranslateApplicationArgs(jargc, jargv, &argc, &argv);
+            if (!AddApplicationOptions(appclassc, appclassv)) {
+                return(1);
+            }
+        } else {
+            /* Set default CLASSPATH */
+            char* cpath = getenv("CLASSPATH");
+            if (cpath != NULL) {
+                SetClassPath(cpath);
+            }
+        }
+
+        /* Parse command line options; if the return value of
+         * ParseArguments is false, the program should exit.
+         */
+        if (!ParseArguments(&argc, &argv, &mode, &what, &ret)) {
+            return(ret);
+        }
+
+        /* Override class path if -jar flag was specified */
+        if (mode == LM_JAR) {
+            SetClassPath(what);     /* Override class path */
+        }
+
+        /* set the -Dsun.java.command pseudo property */
+        SetJavaCommandLineProp(what, argc, argv);
+
+        /* Set the -Dsun.java.launcher pseudo property */
+        SetJavaLauncherProp();
+
+        return JVMInit(&ifn, threadStackSize, argc, argv, mode, what, ret);
+    }
