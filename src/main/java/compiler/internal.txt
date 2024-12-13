@@ -110,3 +110,70 @@ java.base/share/native/libjli/java.c
 
         return JVMInit(&ifn, threadStackSize, argc, argv, mode, what, ret);
     }
+
+---
+
+- CreateExecutionEnvironment(...)
+
+    void
+    CreateExecutionEnvironment(int *pargc, char ***pargv,
+                               char *jdkroot, jint so_jdkroot,
+                               char *jvmpath, jint so_jvmpath,
+                               char *jvmcfg,  jint so_jvmcfg) {
+
+        char *jvmtype;
+        int i = 0;
+        char** argv = *pargv;
+
+        /* Find out where the JDK is that we will be using. */
+        if (!GetJDKInstallRoot(jdkroot, so_jdkroot)) {
+            JLI_ReportErrorMessage(LAUNCHER_ERROR1);
+            exit(2);
+        }
+
+        JLI_Snprintf(jvmcfg, so_jvmcfg, "%s%slib%sjvm.cfg",
+            jdkroot, FILESEP, FILESEP);
+
+        /* Find the specified JVM type */
+        if (ReadKnownVMs(jvmcfg, JNI_FALSE) < 1) {
+            JLI_ReportErrorMessage(CFG_ERROR7);
+            exit(1);
+        }
+
+        jvmtype = CheckJvmType(pargc, pargv, JNI_FALSE);
+        if (JLI_StrCmp(jvmtype, "ERROR") == 0) {
+            JLI_ReportErrorMessage(CFG_ERROR9);
+            exit(4);
+        }
+
+        jvmpath[0] = '\0';
+        if (!GetJVMPath(jdkroot, jvmtype, jvmpath, so_jvmpath)) {
+            JLI_ReportErrorMessage(CFG_ERROR8, jvmtype, jvmpath);
+            exit(4);
+        }
+        /* If we got here, jvmpath has been correctly initialized. */
+
+        /* Check if we need preload AWT */
+    #ifdef ENABLE_AWT_PRELOAD
+        argv = *pargv;
+        for (i = 0; i < *pargc ; i++) {
+            /* Tests the "turn on" parameter only if not set yet. */
+            if (awtPreloadD3D < 0) {
+                if (GetBoolParamValue(PARAM_PRELOAD_D3D, argv[i]) == 1) {
+                    awtPreloadD3D = 1;
+                }
+            }
+            /* Test parameters which can disable preloading if not already disabled. */
+            if (awtPreloadD3D != 0) {
+                if (GetBoolParamValue(PARAM_NODDRAW, argv[i]) == 1
+                    || GetBoolParamValue(PARAM_D3D, argv[i]) == 0
+                    || GetBoolParamValue(PARAM_OPENGL, argv[i]) == 1)
+                {
+                    awtPreloadD3D = 0;
+                    /* no need to test the rest of the parameters */
+                    break;
+                }
+            }
+        }
+    #endif /* ENABLE_AWT_PRELOAD */
+    }
