@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class BigFileReadSample {
@@ -22,6 +23,8 @@ public class BigFileReadSample {
             throw new RuntimeException("File not found");
         }
 
+        String result;
+
         // when
         try (
                 RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
@@ -36,10 +39,13 @@ public class BigFileReadSample {
                 sb.append((char) buffer.get());
             }
 
-            System.out.println(sb);
+            result = sb.toString();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        // then
+        Assertions.assertTrue(result.contains("hello world"));
     }
 
     @Test
@@ -53,6 +59,8 @@ public class BigFileReadSample {
         if (!file.exists()) {
             throw new RuntimeException("File not found");
         }
+
+        String result;
 
         // then
         try (
@@ -75,12 +83,15 @@ public class BigFileReadSample {
                 position += size;
             }
 
-            System.out.println("result = " + sb);
+            result = sb.toString();
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        // then
+        Assertions.assertTrue(result.contains("hello world"));
     }
 
 }
