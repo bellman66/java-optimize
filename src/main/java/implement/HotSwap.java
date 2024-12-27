@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 public class HotSwap {
 
-    static class Watch {
+    static abstract class Watch {
 
         private static final WatchEvent.Kind<?>[] DEFAULT_EVENT = {StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE};
 
@@ -36,9 +36,30 @@ public class HotSwap {
 
         private void register(WatchEvent.Kind<?>... events) throws IOException {
             path.register(watchService, events);
+            task = taskInternal();
+        }
 
-            task = () -> {
-                WatchKey key = watchService.poll();
+        public WatchService getWatchService() {
+            return watchService;
+        }
+
+        public abstract Runnable taskInternal();
+
+        public Runnable getTask() {
+            return task;
+        }
+    }
+
+    static class ClassWatch extends Watch {
+
+        ClassWatch(Path path) throws IOException {
+            super(path);
+        }
+
+        @Override
+        public Runnable taskInternal() {
+            return () -> {
+                WatchKey key = getWatchService().poll();
 
                 if (key == null) {
                     return;
@@ -51,10 +72,6 @@ public class HotSwap {
                 }
             };
         }
-
-        public Runnable getTask() {
-            return task;
-        }
     }
 
     public static void main(String[] args) {
@@ -63,7 +80,7 @@ public class HotSwap {
         try {
             ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
-            Watch watch = new Watch(path);
+            Watch watch = new ClassWatch(path);
 
             executor.scheduleAtFixedRate(watch.getTask(), 0, 1, TimeUnit.SECONDS);
         } catch (IOException e) {
