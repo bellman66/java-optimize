@@ -2,13 +2,15 @@ package implement.howswap.core;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 
 public class ClassWatcher extends Watcher {
 
-    public ClassWatcher(Path path) throws IOException {
+    private Runnable callback;
+
+    public ClassWatcher(Path path, Runnable callback) throws IOException {
         super(path);
+        this.callback = callback;
     }
 
     @Override
@@ -20,11 +22,7 @@ public class ClassWatcher extends Watcher {
                 return;
             }
 
-            for (WatchEvent<?> event : key.pollEvents()) {
-                WatchEvent.Kind<?> kind = event.kind();
-
-                System.out.println("kind = " + kind);
-            }
+            callback.run();
         };
     }
 }
