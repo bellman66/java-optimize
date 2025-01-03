@@ -1,9 +1,9 @@
-package implement;
+package implement.hotswap;
 
-import implement.howswap.core.AppClassLoader;
-import implement.howswap.core.AppContext;
-import implement.howswap.core.ClassWatcher;
-import implement.howswap.core.Watcher;
+import implement.hotswap.core.AppClassLoader;
+import implement.hotswap.core.AppContext;
+import implement.hotswap.core.ClassWatcher;
+import implement.hotswap.core.Watcher;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;

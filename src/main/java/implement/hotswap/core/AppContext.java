@@ -1,4 +1,4 @@
-package implement.howswap.core;
+package implement.hotswap.core;
 
 public class AppContext {
 
