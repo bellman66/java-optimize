@@ -10,7 +10,7 @@ public class JavaclassExecuter {
 
         Class<?> clazz = loader.loadByte(modiBytes);
         try {
-            clazz.getMethod("main", new Class[] {String[].class}).invoke(null, new String[] {null});
+            clazz.getMethod("compileLoop").invoke(null);
         } catch (Exception e) {
             e.printStackTrace(HackSystem.out);
         }
