@@ -1,6 +1,6 @@
 package junit;
 
-import com.intellij.rt.execution.junit.RepeatCount;
+//import com.intellij.rt.execution.junit.RepeatCount;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -106,6 +106,7 @@ public final class JUnitStarter {
     private static String processParameters(List<String> args, final List<? super String> listeners, String[] params) {
         String agentName = isJUnit5Preferred() ? JUNIT5_RUNNER_NAME : JUNIT4_RUNNER_NAME;
         List<String> result = new ArrayList<>(args.size());
+
         for (String arg : args) {
             if (arg.startsWith(IDE_VERSION)) {
                 //ignore
@@ -178,12 +179,12 @@ public final class JUnitStarter {
                     continue;
                 }
 
-                final int count = RepeatCount.getCount(arg);
-                if (count != 0) {
-                    ourRepeatCount = arg;
-                    ourCount = count;
-                    continue;
-                }
+//                final int count = RepeatCount.getCount(arg);
+//                if (count != 0) {
+//                    ourRepeatCount = arg;
+//                    ourCount = count;
+//                    continue;
+//                }
 
                 result.add(arg);
             }
@@ -265,22 +266,23 @@ public final class JUnitStarter {
                                               ArrayList<String> listeners,
                                               String name) {
         try {
-            IdeaTestRunner<?> testRunner = (IdeaTestRunner<?>)getAgentClass(agentName).newInstance();
-            if (ourCommandFileName != null) {
-                if (!"none".equals(ourForkMode) || ourWorkingDirs != null && new File(ourWorkingDirs).length() > 0) {
-                    final List<String> newArgs = new ArrayList<>();
-                    newArgs.add(agentName);
-                    newArgs.addAll(listeners);
-                    return new JUnitForkedSplitter(ourWorkingDirs, ourForkMode, newArgs)
-                            .startSplitting(args, name, ourCommandFileName, ourRepeatCount);
-                }
-            }
-            return IdeaTestRunner.Repeater.startRunnerWithArgs(testRunner, args, listeners, name, ourCount, true);
+//            IdeaTestRunner<?> testRunner = (IdeaTestRunner<?>)getAgentClass(agentName).newInstance();
+//            if (ourCommandFileName != null) {
+//                if (!"none".equals(ourForkMode) || ourWorkingDirs != null && new File(ourWorkingDirs).length() > 0) {
+//                    final List<String> newArgs = new ArrayList<>();
+//                    newArgs.add(agentName);
+//                    newArgs.addAll(listeners);
+//                    return new JUnitForkedSplitter(ourWorkingDirs, ourForkMode, newArgs)
+//                            .startSplitting(args, name, ourCommandFileName, ourRepeatCount);
+//                }
+//            }
+//            return IdeaTestRunner.Repeater.startRunnerWithArgs(testRunner, args, listeners, name, ourCount, true);
         }
         catch (Exception e) {
             e.printStackTrace(System.err);
             return -2;
         }
+        return 1;
     }
 
     static Class<?> getAgentClass(String agentName) throws ClassNotFoundException {
